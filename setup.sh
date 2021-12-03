@@ -17,4 +17,4 @@ cd $DIR/toolchain && tar -xf cb7b3ac1b7fdb49474ff68761909934d1142f594.tar.gz
 cd $DIR/toolchain && tar -xf 961622e926a1b21382dba4dd9fe0e5fb3ee5ab7c.tar.gz
 cd $DIR/toolchain && tar -xf clang-r437112.tar.gz
 
-cd $DIR && git clone --depth=1 https://github.com/zaharchenko-main/kernel_lenovo_sdm710 kernel
+cd $DIR && git clone --depth=1 https://github.com/CorvusRom-Devices/kernel_lenovo_sdm710 kernel
