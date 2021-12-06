@@ -2,11 +2,10 @@
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
-export PATH=$DIR"/toolchain/bin":$PATH
-export LD_LIBRARY_PATH=$DIR"/toolchain/lib64":$LD_LIBRARY_PATH
+export PATH=$DIR"/toolchain/clang/bin":$DIR"/toolchain/gcc/bin":$PATH
+export LD_LIBRARY_PATH=$DIR"/toolchain/clang/lib64":$LD_LIBRARY_PATH
 
 export ARCH=arm64
-export SUBARCH=arm64
 export CLANG_TRIPLE=aarch64-linux-gnu-
 export CROSS_COMPILE=aarch64-linux-android-
 export CROSS_COMPILE_ARM32=arm-linux-androideabi-
