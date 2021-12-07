@@ -23,5 +23,5 @@ cd $DIR/kernel && make \
 	STRIP=llvm-strip \
 	clean \
 	mrproper \
-	jd2019_defconfig \
+	$(cat $DIR/devive)_defconfig \
 	menuconfig
