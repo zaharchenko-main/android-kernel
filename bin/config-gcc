@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIR="$(cd "$(dirname "$0")" && pwd)"
+DIR="$(cd "$(dirname "$0")" && pwd)""/.."
 
 export PATH=$DIR"/toolchain/gcc/bin":$PATH
 
@@ -12,4 +12,7 @@ cd $DIR/kernel && make \
 	O=$DIR/out \
 	ARCH=$ARCH \
 	CROSS_COMPILE=$CROSS_COMPILE \
-	-j$(nproc --all)
+	clean \
+	mrproper \
+	jd2019_defconfig \
+	menuconfig

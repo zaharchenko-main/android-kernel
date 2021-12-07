@@ -1,0 +1,13 @@
+#!/bin/bash
+
+DIR="$(cd "$(dirname "$0")" && pwd)""/.."
+
+sudo apt install clang wget build-essential bc flex git \
+        bison gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+        zip unzip git wget gcc g++ libncurses5-dev  \
+        xz-utils -y
+
+mkdir -p $DIR/out
+mkdir -p $DIR/toolchain
+mkdir -p $DIR/toolchain/gcc
+mkdir -p $DIR/toolchain/clang

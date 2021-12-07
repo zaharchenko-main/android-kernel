@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIR="$(cd "$(dirname "$0")" && pwd)"
+DIR="$(cd "$(dirname "$0")" && pwd)""/.."
 
 export PATH=$DIR"/toolchain/clang/bin":$DIR"/toolchain/gcc/bin":$PATH
 export LD_LIBRARY_PATH=$DIR"/toolchain/clang/lib64":$LD_LIBRARY_PATH
