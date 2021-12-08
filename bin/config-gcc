@@ -5,6 +5,7 @@ DIR="$(cd "$(dirname "$0")" && pwd)""/.."
 export PATH=$DIR"/toolchain/gcc/bin":$PATH
 
 export ARCH=arm64
+export SUBARCH=arm64
 export CROSS_COMPILE=aarch64-linux-androidkernel-
 export CROSS_COMPILE_ARM32=arm-linux-androidkernel-
 
