@@ -3,9 +3,9 @@
 DIR="$(cd "$(dirname "$0")" && pwd)""/.."
 
 sudo apt install clang wget build-essential bc flex git \
-        bison gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+        bison gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf \
         zip unzip git wget gcc g++ libncurses5-dev  \
-        xz-utils -y
+        xz-utils libncurses6 -y
 
 mkdir -p $DIR/out
 mkdir -p $DIR/toolchain
