@@ -117,7 +117,7 @@ update() {
   echo "ui_print(\"   Device: jd2019\");" >> $FILE
   echo "ui_print(\"   Android version: 12\");" >> $FILE
   echo "ui_print(\"   Kernel version: 4.9.280\");" >> $FILE
-  echo "ui_print(\"   Build date: $(date +%Y-%m-%d)\");" >> $FILE
+  echo "ui_print(\"   Build date: $(echo $DATE_NAME)\");" >> $FILE
   echo "ui_print(\"----------------------------------------------\");" >> $FILE
   echo "ui_print(\"Patching boot image unconditionally...\");" >> $FILE
   echo "package_extract_file(\"boot.img\", \"/dev/block/bootdevice/by-name/boot\");" >> $FILE
