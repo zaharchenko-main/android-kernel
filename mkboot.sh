@@ -30,7 +30,6 @@ cd $DIR/boot && python3 $DIR/boot/bin/mkbootimg.py \
   --os_patch_level "2021-12-16" \
   --pagesize "4096" \
   --board "" \
-  --hashtype sha1 \
   --header_version "0" \
   -o boot.img
 
