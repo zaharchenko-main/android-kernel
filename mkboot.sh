@@ -26,8 +26,8 @@ cd $DIR/boot && python3 $DIR/boot/bin/mkbootimg.py \
   --ramdisk_offset "0x00000000" \
   --second_offset "0x00000000" \
   --tags_offset "0x00000100" \
-  --os_version "12.0.0" \
-  --os_patch_level "2021-12-16" \
+  --os_version "$(cat $DIR/version).0.0" \
+  --os_patch_level "$(date +%Y-%m-%d)" \
   --pagesize "4096" \
   --board "" \
   --header_version "0" \
@@ -36,4 +36,4 @@ cd $DIR/boot && python3 $DIR/boot/bin/mkbootimg.py \
 cp $DIR/boot/boot.img $DIR/update/boot.img
 cp $DIR/boot/dtbo.img $DIR/update/dtbo.img
 
-cd $DIR/update && zip -r9 InfernoKernel_$(cat $DIR/devive)-12-20211215.zip META-INF boot.img dtbo.img
+cd $DIR/update && zip -r9 InfernoKernel_$(cat $DIR/devive)-$(cat $DIR/version)-$(date +%Y%m%d).zip META-INF boot.img dtbo.img
