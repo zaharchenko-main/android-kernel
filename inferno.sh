@@ -114,8 +114,8 @@ update() {
   echo "ui_print(\"              Inferno Kernel\");" >> $FILE
   echo "ui_print(\"              by Zaharchenko\");" >> $FILE
   echo "ui_print(\"----------------------------------------------\");" >> $FILE
-  echo "ui_print(\"   Device: jd2019\");" >> $FILE
-  echo "ui_print(\"   Android version: 12\");" >> $FILE
+  echo "ui_print(\"   Device: $(echo $DEVICE)\");" >> $FILE
+  echo "ui_print(\"   Android version: $(echo $OS)\");" >> $FILE
   echo "ui_print(\"   Kernel version: 4.9.280\");" >> $FILE
   echo "ui_print(\"   Build date: $(echo $DATE_NAME)\");" >> $FILE
   echo "ui_print(\"----------------------------------------------\");" >> $FILE
