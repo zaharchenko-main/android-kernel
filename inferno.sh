@@ -80,6 +80,9 @@ build() {
 }
 
 update() {
+  FILE=$DIR/update/META-INF/com/google/android/updater-script
+  touch $FILE
+
   cp $DIR/out/arch/arm64/boot/Image.gz-dtb $DIR/boot/kernel
   cat $DIR/out/arch/arm64/boot/dts/qcom/*.dtb > $DIR/boot/dtb
   touch $DIR/boot/ramdisk
@@ -106,6 +109,21 @@ update() {
 
   cp $DIR/boot/boot.img $DIR/update/boot.img
   cp $DIR/boot/dtbo.img $DIR/update/dtbo.img
+
+  echo "ui_print(\"----------------------------------------------\");" > $FILE
+  echo "ui_print(\"              Inferno Kernel\");" >> $FILE
+  echo "ui_print(\"              by Zaharchenko\");" >> $FILE
+  echo "ui_print(\"----------------------------------------------\");" >> $FILE
+  echo "ui_print(\"   Device: jd2019\");" >> $FILE
+  echo "ui_print(\"   Android version: 12\");" >> $FILE
+  echo "ui_print(\"   Kernel version: 4.9.280\");" >> $FILE
+  echo "ui_print(\"   Build date: $(date +%Y-%m-%d)\");" >> $FILE
+  echo "ui_print(\"----------------------------------------------\");" >> $FILE
+  echo "ui_print(\"Patching boot image unconditionally...\");" >> $FILE
+  echo "package_extract_file(\"boot.img\", \"/dev/block/bootdevice/by-name/boot\");" >> $FILE
+  echo "ui_print(\"Patching dtbo image unconditionally...\");" >> $FILE
+  echo "package_extract_file(\"dtbo.img\", \"/dev/block/bootdevice/by-name/dtbo\");" >> $FILE
+  echo "set_progress(1.000000);" >> $FILE
 
   cd $DIR/update
 
