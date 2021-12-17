@@ -142,17 +142,17 @@ help() {
   echo "  mrproper   - clear kernel source and 'out'"
   echo "  * help     - show this message"
   echo ""
-  echo "  download-linaro-gcc
-  echo "  download-aosp-gcc
-  echo "  download-aosp-clang
+  echo "  download-linaro-gcc -       "
+  echo "  download-aosp-gcc   -       "
+  echo "  download-aosp-clang -       "
   echo ""
-  echo "  config-linaro-gcc"
-  echo "  config-aosp-gcc"
-  echo "  config-aosp-clang"
+  echo "  config-linaro-gcc   -       "
+  echo "  config-aosp-gcc     -       "
+  echo "  config-aosp-clang   -       "
   echo ""
-  echo "  build-linaro-gcc"
-  echo "  build-aosp-gcc"
-  echo "  build-aosp-clang"
+  echo "  build-linaro-gcc    -       "
+  echo "  build-aosp-gcc      -       "
+  echo "  build-aosp-clang    -       "
 }
 
 case "$1" in
