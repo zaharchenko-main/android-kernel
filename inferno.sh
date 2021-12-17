@@ -132,6 +132,7 @@ update() {
 
 help() {
   echo "Usage: $0 [arg]"
+  echo ""
   echo "  setup      - download required components"
   echo "  config     - run device configuration"
   echo "  menuconfig - run 'menuconfig' for editing"
@@ -140,6 +141,18 @@ help() {
   echo "  clean      - delete files created by script"
   echo "  mrproper   - clear kernel source and 'out'"
   echo "  * help     - show this message"
+  echo ""
+  echo "  download-linaro-gcc
+  echo "  download-aosp-gcc
+  echo "  download-aosp-clang
+  echo ""
+  echo "  config-linaro-gcc"
+  echo "  config-aosp-gcc"
+  echo "  config-aosp-clang"
+  echo ""
+  echo "  build-linaro-gcc"
+  echo "  build-aosp-gcc"
+  echo "  build-aosp-clang"
 }
 
 case "$1" in
