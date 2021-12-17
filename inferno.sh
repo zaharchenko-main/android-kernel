@@ -16,7 +16,6 @@ PATCH_LVL="$(date +%Y-%m-%d)"
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
-CROSS_COMPILE=$DIR"/gcc/bin/aarch64-linux-gnu-"
 
 
 
@@ -60,15 +59,12 @@ config() {
   cd $DIR/kernel && make \
     O=$DIR/out \
     ARCH=$ARCH \
-    CROSS_COMPILE=$CROSS_COMPILE \
     $(echo $DEVICE)_defconfig
 }
 
 menuconfig() {
-  cd $DIR/kernel && make \
-    O=$DIR/out \
+  cd $DIR/out && make \
     ARCH=$ARCH \
-    CROSS_COMPILE=$CROSS_COMPILE \
     menuconfig
 }
 
@@ -145,10 +141,6 @@ help() {
   echo "  download-linaro-gcc -       "
   echo "  download-aosp-gcc   -       "
   echo "  download-aosp-clang -       "
-  echo ""
-  echo "  config-linaro-gcc   -       "
-  echo "  config-aosp-gcc     -       "
-  echo "  config-aosp-clang   -       "
   echo ""
   echo "  build-linaro-gcc    -       "
   echo "  build-aosp-gcc      -       "
