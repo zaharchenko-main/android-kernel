@@ -1,41 +1,23 @@
 #!/usr/bin/env bash
 
-
-
-OS="12"
-
-ARCH="arm64"
-
-DEVICE="jd2019"
-
-PROC="$(nproc --all)"
-
-DATE_NAME="$(date +%Y%m%d)"
-
-PATCH_LVL="$(date +%Y-%m-%d)"
-
 DIR="$(cd "$(dirname "$0")" && pwd)"
+TOLCHAINS=$DIR"/toolchains"
+DATE_NAME="$(date +%Y%m%d)"
+PATCH_LVL="$(date +%Y-%m-%d)"
+PROCS="$(nproc --all)"
 
+FILE=$DIR"/update/META-INF/com/google/android/updater-script"
 
-
+source $DIR/params
 
 setup() {
-  mkdir -p $DIR/boot/bin
-
   sudo apt install clang wget build-essential \
     bc flex git bison gcc-aarch64-linux-gnu \
     gcc-arm-linux-gnueabihf libncurses6 lzip \
     zip unzip git wget gcc g++ libncurses5-dev  \
     xz-utils libncurses6 python3 python2 -y
 
-  cd $DIR
-
-  wget https://snapshots.linaro.org/gnu-toolchain/11.2-2021.12-1/aarch64-linux-gnu/gcc-linaro-11.2.1-2021.12-x86_64_aarch64-linux-gnu.tar.xz
-  tar -xf gcc-linaro-11.2.1-2021.12-x86_64_aarch64-linux-gnu.tar.xz
-  rm -rf  gcc-linaro-11.2.1-2021.12-x86_64_aarch64-linux-gnu.tar.xz
-  mv gcc-linaro-11.2.1-2021.12-x86_64_aarch64-linux-gnu gcc
-
-  cd $DIR/boot/bin
+  rm -rf $DIR/boot && mkdir -p $DIR/boot/bin && cd $DIR/boot/bin
 
   wget https://android.googlesource.com/platform/system/tools/mkbootimg/+archive/refs/heads/master.tar.gz
   wget https://android.googlesource.com/platform/system/libufdt/+archive/refs/heads/master/utils/src.tar.gz
@@ -47,37 +29,26 @@ setup() {
 }
 
 clean() {
-  rm -rf $DIR/boot $DIR/update/boot.img $DIR/update/dtbo.img $DIR/update/InfernoKernel_$DEVICE-$OS-$DATE_NAME.zip $DIR/gcc
-}
-
-mrproper() {
-  cd $DIR/kernel && make clean mrproper
-  cd $DIR/out && make clean mrproper
+  rm -rf $DIR/boot $DIR/update/boot.img $DIR/update/dtbo.img $DIR/update/InfernoKernel_$DEVICE-$OS-$DATE_NAME.zip $TOOLCHAINS $FILE
 }
 
 config() {
   cd $DIR/kernel && make \
     O=$DIR/out \
     ARCH=$ARCH \
+    SUBARCH=$ARCH \
     $(echo $DEVICE)_defconfig
 }
 
 menuconfig() {
   cd $DIR/out && make \
     ARCH=$ARCH \
+    SUBARCH=$ARCH \
     menuconfig
 }
 
-build() {
-  cd $DIR/out && make \
-    ARCH=$ARCH \
-    CROSS_COMPILE=$CROSS_COMPILE \
-    -j$(echo $PROC)
-}
-
 update() {
-  FILE=$DIR/update/META-INF/com/google/android/updater-script
-  touch $FILE
+  rm -rf $FILE && touch $FILE
 
   cp $DIR/out/arch/arm64/boot/Image.gz-dtb $DIR/boot/kernel
   cat $DIR/out/arch/arm64/boot/dts/qcom/*.dtb > $DIR/boot/dtb
@@ -126,25 +97,129 @@ update() {
   zip -r9 InfernoKernel_$DEVICE-$OS-$DATE_NAME.zip META-INF boot.img dtbo.img
 }
 
+clean() {
+  rm -rf $DIR/boot $DIR/update/boot.img $DIR/update/dtbo.img $DIR/update/InfernoKernel_$DEVICE-$OS-$DATE_NAME.zip $TOLCHAINS $FILE
+}
+
+mrproper() {
+  cd $DIR/kernel && make clean mrproper
+  cd $DIR/out && make clean mrproper
+}
+
+download-linaro-gcc() {
+  rm -rf $TOLCHAINS/linaro-gcc && mkdir -p $TOLCHAINS && cd $TOLCHAINS
+  wget https://snapshots.linaro.org/gnu-toolchain/11.2-2021.12-1/aarch64-linux-gnu/gcc-linaro-11.2.1-2021.12-x86_64_aarch64-linux-gnu.tar.xz
+  tar -xf gcc-linaro-11.2.1-2021.12-x86_64_aarch64-linux-gnu.tar.xz
+  rm -rf  gcc-linaro-11.2.1-2021.12-x86_64_aarch64-linux-gnu.tar.xz
+  mv gcc-linaro-11.2.1-2021.12-x86_64_aarch64-linux-gnu linaro-gcc
+}
+
+download-aosp-gcc() {
+  rm -rf $TOLCHAINS/aosp-gcc && mkdir -p $TOLCHAINS/aosp-gcc && cd $TOLCHAINS/aosp-gcc
+  wget https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/+archive/961622e926a1b21382dba4dd9fe0e5fb3ee5ab7c.tar.gz
+  wget https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/+archive/cb7b3ac1b7fdb49474ff68761909934d1142f594.tar.gz
+  tar -xf 961622e926a1b21382dba4dd9fe0e5fb3ee5ab7c.tar.gz
+  tar -xf cb7b3ac1b7fdb49474ff68761909934d1142f594.tar.gz
+  rm -rf 961622e926a1b21382dba4dd9fe0e5fb3ee5ab7c.tar.gz cb7b3ac1b7fdb49474ff68761909934d1142f594.tar.gz
+}
+
+download-aosp-clang() {
+  rm -rf $TOLCHAINS/aosp-clang && mkdir -p $TOLCHAINS/aosp-clang && cd $TOLCHAINS/aosp-clang
+  wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r437112.tar.gz
+  wget https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/+archive/961622e926a1b21382dba4dd9fe0e5fb3ee5ab7c.tar.gz
+  wget https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/+archive/cb7b3ac1b7fdb49474ff68761909934d1142f594.tar.gz
+
+  tar -xf 961622e926a1b21382dba4dd9fe0e5fb3ee5ab7c.tar.gz
+  tar -xf cb7b3ac1b7fdb49474ff68761909934d1142f594.tar.gz
+  tar -xf clang-r437112.tar.gz
+  rm -rf 961622e926a1b21382dba4dd9fe0e5fb3ee5ab7c.tar.gz clang-r437112.tar.gz cb7b3ac1b7fdb49474ff68761909934d1142f594.tar.gz
+}
+
+download-proton-clang() {
+  rm -rf $TOLCHAINS/proton-clang && mkdir -p $TOLCHAINS && cd $TOLCHAINS
+  git clone --depth=1 https://github.com/kdrag0n/proton-clang
+}
+
+build-linaro-gcc() {
+  cd $DIR/out && make \
+    ARCH=$ARCH \
+    SUBARCH=$ARCH \
+    CROSS_COMPILE=$TOLCHAINS"/linaro-gcc/bin/aarch64-linux-gnu-" \
+    -j$(echo $PROCS)
+}
+
+build-aosp-gcc() {
+  cd $DIR/out && make \
+    ARCH=$ARCH \
+    SUBARCH=$ARCH \
+    CROSS_COMPILE=$TOLCHAINS"/aosp-gcc/bin/aarch64-linux-android-" \
+    CROSS_COMPILE_ARM32=$TOLCHAINS"/aosp-gcc/bin/arm-linux-androideabi-" \
+    -j$(echo $PROCS)
+}
+
+build-aosp-clang() {
+  export CLANG_TRIPLE="aarch64-linux-gnu-"
+  export PATH=$TOLCHAINS"/aosp-clang/bin":$PATH
+  export LD_LIBRARY_PATH=$TOLCHAINS"/aosp-clang/lib64":$LD_LIBRARY_PATH
+
+  cd $DIR/out && make \
+    ARCH=$ARCH \
+    SUBARCH=$ARCH \
+    CROSS_COMPILE="aarch64-linux-android-" \
+    CROSS_COMPILE_ARM32="arm-linux-androideabi-" \
+    CC="clang" \
+    AR="llvm-ar" \
+    AS="llvm-as" \
+    NM="llvm-nm" \
+    OBJCOPY="llvm-objcopy" \
+    OBJDUMP="llvm-objdump" \
+    READELF="llvm-readelf" \
+    OBJSIZE="llvm-size" \
+    STRIP="llvm-strip" \
+    -j$(echo $PROCS)
+}
+
+build-proton-clang() {
+  export CLANG_TRIPLE="aarch64-linux-gnu-"
+  export PATH=$TOLCHAINS"/proton-clang/bin":$PATH
+  export LD_LIBRARY_PATH=$TOLCHAINS"/proton-clang/lib64":$LD_LIBRARY_PATH
+
+  cd $DIR/out && make \
+    ARCH=$ARCH \
+    SUBARCH=$ARCH \
+    CROSS_COMPILE="aarch64-linux-gnu-" \
+    CROSS_COMPILE_ARM32="arm-linux-gnueabi-" \
+    CC="clang" \
+    AR="llvm-ar" \
+    AS="llvm-as" \
+    NM="llvm-nm" \
+    OBJCOPY="llvm-objcopy" \
+    OBJDUMP="llvm-objdump" \
+    READELF="llvm-readelf" \
+    OBJSIZE="llvm-size" \
+    STRIP="llvm-strip" \
+    -j$(echo $PROCS)
+}
+
 help() {
   echo "Usage: $0 [arg]"
   echo ""
   echo "  setup      - download required components"
   echo "  config     - run device configuration"
   echo "  menuconfig - run 'menuconfig' for editing"
-  echo "  build      - start build"
   echo "  update     - create flashable file .zip"
   echo "  clean      - delete files created by script"
   echo "  mrproper   - clear kernel source and 'out'"
-  echo "  * help     - show this message"
   echo ""
-  echo "  download-linaro-gcc -       "
-  echo "  download-aosp-gcc   -       "
-  echo "  download-aosp-clang -       "
+  echo "  download-linaro-gcc   - download linaro (GCC)"
+  echo "  download-aosp-gcc     - download aosp (GCC)"
+  echo "  download-aosp-clang   - download aosp llvm (clang)"
+  echo "  download-proton-clang - download proton (clang)"
   echo ""
-  echo "  build-linaro-gcc    -       "
-  echo "  build-aosp-gcc      -       "
-  echo "  build-aosp-clang    -       "
+  echo "  build-linaro-gcc   - start building with linaro (GCC)"
+  echo "  build-aosp-gcc     - start building with aosp (GCC)"
+  echo "  build-aosp-clang   - start building with aosp llvm (clang)"
+  echo "  build-proton-clang - start building with proton (clang)"
 }
 
 case "$1" in
@@ -160,14 +235,35 @@ case "$1" in
   menuconfig )
     menuconfig
     ;;
-  build )
-    build
-    ;;
   setup )
     setup
     ;;
   update )
     update
+    ;;
+  download-linaro-gcc )
+    download-linaro-gcc
+    ;;
+  download-aosp-gcc )
+    download-aosp-gcc
+    ;;
+  download-aosp-clang )
+    download-aosp-clang
+    ;;
+  download-proton-clang )
+    download-proton-clang
+    ;;
+  build-linaro-gcc )
+    build-linaro-gcc
+    ;;
+  build-aosp-gcc )
+    build-aosp-gcc
+    ;;
+  build-aosp-clang )
+    build-aosp-clang
+    ;;
+  build-proton-clang )
+    build-proton-clang
     ;;
   * )
     help
